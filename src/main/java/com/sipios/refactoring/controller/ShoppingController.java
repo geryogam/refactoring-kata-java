@@ -2,7 +2,6 @@ package com.sipios.refactoring.controller;
 
 import java.time.Month;
 import java.time.ZonedDateTime;
-import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -11,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.sipios.refactoring.model.Body;
+import com.sipios.refactoring.model.Item;
 
 @RestController
 @RequestMapping("/shopping")
@@ -111,53 +113,5 @@ public class ShoppingController {
         }
 
         return String.valueOf(p);
-    }
-}
-
-class Body {
-
-    private Item[] items;
-    private String type;
-    private ZonedDateTime dateTime;
-
-    public Body(Item[] is, String t, ZonedDateTime dateTime) {
-        this.items = is;
-        this.type = t;
-        if (dateTime == null) {
-          this.dateTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
-        } else {
-          this.dateTime = dateTime;
-        }
-    }
-
-    public Item[] getItems() {
-        return items;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public ZonedDateTime getDateTime() {
-        return dateTime;
-    }
-}
-
-class Item {
-
-    private String type;
-    private int nb;
-
-    public Item(String type, int quantity) {
-        this.type = type;
-        this.nb = quantity;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public int getNb() {
-        return nb;
     }
 }

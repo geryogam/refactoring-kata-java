@@ -1,12 +1,14 @@
 package com.sipios.refactoring.controller;
 
-import com.sipios.refactoring.UnitTest;
-
 import java.time.ZonedDateTime;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+
+import com.sipios.refactoring.UnitTest;
+import com.sipios.refactoring.model.Body;
+import com.sipios.refactoring.model.Item;
 
 class ShoppingControllerTests extends UnitTest {
 
