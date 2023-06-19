@@ -1,8 +1,8 @@
 package com.sipios.refactoring.controller;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.time.Month;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,10 +22,7 @@ public class ShoppingController {
     public String getPrice(@RequestBody Body b) {
         double p = 0;
         double d;
-
-        Date date = new Date();
-        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
-        cal.setTime(date);
+        final ZonedDateTime dateTime = b.getDateTime();
 
         // Compute discount for customer
         if (b.getType().equals("STANDARD_CUSTOMER")) {
@@ -42,14 +39,14 @@ public class ShoppingController {
         // if we are in winter or summer discounts periods
         if (
             !(
-                cal.get(Calendar.DAY_OF_MONTH) < 15 &&
-                cal.get(Calendar.DAY_OF_MONTH) > 5 &&
-                cal.get(Calendar.MONTH) == 5
+                dateTime.getDayOfMonth() < 15 &&
+                dateTime.getDayOfMonth() > 5 &&
+                dateTime.getMonth() == Month.JANUARY
             ) &&
             !(
-                cal.get(Calendar.DAY_OF_MONTH) < 15 &&
-                cal.get(Calendar.DAY_OF_MONTH) > 5 &&
-                cal.get(Calendar.MONTH) == 0
+                dateTime.getDayOfMonth() < 15 &&
+                dateTime.getDayOfMonth() > 5 &&
+                dateTime.getMonth() == Month.JUNE
             )
         ) {
             if (b.getItems() == null) {
@@ -121,28 +118,28 @@ class Body {
 
     private Item[] items;
     private String type;
+    private ZonedDateTime dateTime;
 
-    public Body(Item[] is, String t) {
+    public Body(Item[] is, String t, ZonedDateTime dateTime) {
         this.items = is;
         this.type = t;
+        if (dateTime == null) {
+          this.dateTime = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+        } else {
+          this.dateTime = dateTime;
+        }
     }
-
-    public Body() {}
 
     public Item[] getItems() {
         return items;
-    }
-
-    public void setItems(Item[] items) {
-        this.items = items;
     }
 
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public ZonedDateTime getDateTime() {
+        return dateTime;
     }
 }
 
@@ -150,8 +147,6 @@ class Item {
 
     private String type;
     private int nb;
-
-    public Item() {}
 
     public Item(String type, int quantity) {
         this.type = type;
@@ -162,15 +157,7 @@ class Item {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public int getNb() {
         return nb;
-    }
-
-    public void setNb(int nb) {
-        this.nb = nb;
     }
 }
