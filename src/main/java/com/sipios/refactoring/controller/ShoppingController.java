@@ -21,27 +21,27 @@ public class ShoppingController {
     private Logger logger = LoggerFactory.getLogger(ShoppingController.class);
 
     @PostMapping
-    public String getPrice(@RequestBody Body b) {
-        double p = 0;
-        final ZonedDateTime dateTime = b.getDateTime();
+    public String getPrice(@RequestBody Body body) {
+        double totalPrice = 0;
+        final ZonedDateTime dateTime = body.getDateTime();
         if (
             isWinterDiscountPeriod(dateTime)
             || isSummerDiscountPeriod(dateTime)
         ) {
-            for (Item item: b.getItems()) {
-                p += item.getPrice() * item.getNb()
-                    * item.getSeasonalDiscount() * b.getCustomerDiscount();
+            for (Item item: body.getItems()) {
+                totalPrice += item.getPrice() * item.getNb()
+                    * item.getSeasonalDiscount() * body.getCustomerDiscount();
             }
         } else {
-            for (Item item: b.getItems()) {
-                p += item.getPrice() * item.getNb() * b.getCustomerDiscount();
+            for (Item item: body.getItems()) {
+                totalPrice += item.getPrice() * item.getNb() * body.getCustomerDiscount();
             }
         }
-        if (p > b.getTotalPriceLimit()) {
-            final String message = "Price (" + p + ") is too high";
+        if (totalPrice > body.getTotalPriceLimit()) {
+            final String message = "Price (" + totalPrice + ") is too high";
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
-        return String.valueOf(p);
+        return String.valueOf(totalPrice);
     }
 
     private boolean isWinterDiscountPeriod(ZonedDateTime dateTime) {
