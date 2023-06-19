@@ -30,4 +30,15 @@ public class Body {
     public ZonedDateTime getDateTime() {
         return dateTime;
     }
+
+    public double getCustomerDiscount() {
+        if (type.equals("STANDARD_CUSTOMER")) {
+          return 1;
+        } else if (type.equals("PREMIUM_CUSTOMER")) {
+          return 0.9;
+        } else if (type.equals("PLATINUM_CUSTOMER")) {
+          return 0.5;
+        }
+        return 1;
+    }
 }

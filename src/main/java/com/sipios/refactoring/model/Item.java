@@ -17,4 +17,26 @@ public class Item {
     public int getNb() {
         return nb;
     }
+
+    public double getPrice() {
+        if (type.equals("TSHIRT")) {
+          return 30;
+        } else if (type.equals("DRESS")) {
+          return 50;
+        } else if (type.equals("JACKET")) {
+          return 100;
+        }
+        return 0;
+    }
+
+    public double getSeasonalDiscount() {
+        if (type.equals("TSHIRT")) {
+          return 1;
+        } else if (type.equals("DRESS")) {
+          return 0.8;
+        } else if (type.equals("JACKET")) {
+          return 0.9;
+        }
+        return 1;
+    }
 }

@@ -23,73 +23,20 @@ public class ShoppingController {
     @PostMapping
     public String getPrice(@RequestBody Body b) {
         double p = 0;
-        double d;
         final ZonedDateTime dateTime = b.getDateTime();
-
-        // Compute discount for customer
-        if (b.getType().equals("STANDARD_CUSTOMER")) {
-            d = 1;
-        } else if (b.getType().equals("PREMIUM_CUSTOMER")) {
-            d = 0.9;
-        } else if (b.getType().equals("PLATINUM_CUSTOMER")) {
-            d = 0.5;
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        // Compute total amount depending on the types and quantity of product and
-        // if we are in winter or summer discounts periods
         if (
-            !(
-                dateTime.getDayOfMonth() < 15 &&
-                dateTime.getDayOfMonth() > 5 &&
-                dateTime.getMonth() == Month.JANUARY
-            ) &&
-            !(
-                dateTime.getDayOfMonth() < 15 &&
-                dateTime.getDayOfMonth() > 5 &&
-                dateTime.getMonth() == Month.JUNE
-            )
+            isWinterDiscountPeriod(dateTime)
+            || isSummerDiscountPeriod(dateTime)
         ) {
-            if (b.getItems() == null) {
-                return "0";
-            }
-
-            for (int i = 0; i < b.getItems().length; i++) {
-                Item it = b.getItems()[i];
-
-                if (it.getType().equals("TSHIRT")) {
-                    p += 30 * it.getNb() * d;
-                } else if (it.getType().equals("DRESS")) {
-                    p += 50 * it.getNb() * d;
-                } else if (it.getType().equals("JACKET")) {
-                    p += 100 * it.getNb() * d;
-                }
-                // else if (it.getType().equals("SWEATSHIRT")) {
-                //     price += 80 * it.getNb();
-                // }
+            for (Item item: b.getItems()) {
+                p += item.getPrice() * item.getNb()
+                    * item.getSeasonalDiscount() * b.getCustomerDiscount();
             }
         } else {
-            if (b.getItems() == null) {
-                return "0";
-            }
-
-            for (int i = 0; i < b.getItems().length; i++) {
-                Item it = b.getItems()[i];
-
-                if (it.getType().equals("TSHIRT")) {
-                    p += 30 * it.getNb() * d;
-                } else if (it.getType().equals("DRESS")) {
-                    p += 50 * it.getNb() * 0.8 * d;
-                } else if (it.getType().equals("JACKET")) {
-                    p += 100 * it.getNb() * 0.9 * d;
-                }
-                // else if (it.getType().equals("SWEATSHIRT")) {
-                //     price += 80 * it.getNb();
-                // }
+            for (Item item: b.getItems()) {
+                p += item.getPrice() * item.getNb() * b.getCustomerDiscount();
             }
         }
-
         try {
             if (b.getType().equals("STANDARD_CUSTOMER")) {
                 if (p > 200) {
@@ -111,7 +58,16 @@ public class ShoppingController {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
-
         return String.valueOf(p);
+    }
+
+    private boolean isWinterDiscountPeriod(ZonedDateTime dateTime) {
+        return dateTime.getDayOfMonth() > 5 && dateTime.getDayOfMonth() < 15
+          && dateTime.getMonth() == Month.JANUARY;
+    }
+
+    private boolean isSummerDiscountPeriod(ZonedDateTime dateTime) {
+        return dateTime.getDayOfMonth() > 5 && dateTime.getDayOfMonth() < 15
+          && dateTime.getMonth() == Month.JUNE;
     }
 }
